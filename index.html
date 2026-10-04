@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taskflow — Modern To-Do & Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="brand-badge">✨ Daily Planner</div>
+          <h1 class="app-title">My Tasks</h1>
+          <p class="app-subtitle" id="current-date">Stay focused and productive today</p>
+        </div>
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="stats-card">
+        <div class="stats-info">
+          <span class="stats-label">Daily Progress</span>
+          <span class="stats-count" id="progress-text">0/0 completed</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Task Input Form -->
+    <form id="todo-form" class="todo-form">
+      <div class="input-row">
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 8v8"></path>
+            <path d="M8 12h8"></path>
+          </svg>
+          <input
+            type="text"
+            id="task-input"
+            class="task-input"
+            placeholder="Add a new task (e.g., Design homepage prototype)..."
+            autocomplete="off"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-primary" aria-label="Add Task">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Task</span>
+        </button>
+      </div>
+
+      <!-- Options Row -->
+      <div class="input-options">
+        <div class="option-item">
+          <span class="option-label">Priority:</span>
+          <select id="priority-select" class="custom-select">
+            <option value="normal" selected>⚡ Normal</option>
+            <option value="high">🔥 High</option>
+            <option value="low">🌱 Low</option>
+          </select>
+        </div>
+
+        <div class="option-item">
+          <span class="option-label">Category:</span>
+          <select id="category-select" class="custom-select">
+            <option value="Personal">🟣 Personal</option>
+            <option value="Work">🔵 Work</option>
+            <option value="Shopping">🟠 Shopping</option>
+            <option value="Health">🟢 Health</option>
+            <option value="Other">⚪ Other</option>
+          </select>
+        </div>
+
+        <div class="option-item">
+          <span class="option-label">Due:</span>
+          <input type="date" id="due-date-input" class="custom-date" />
+        </div>
+
+        <div class="quick-due-chips">
+          <button type="button" class="quick-date-btn" data-days="0">Today</button>
+          <button type="button" class="quick-date-btn" data-days="1">Tomorrow</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Toolbar: Search & Filter Tabs -->
+    <div class="controls-toolbar">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search tasks..." />
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">
+          <span>All</span>
+          <span class="filter-counter" id="count-all">0</span>
+        </button>
+        <button class="filter-tab" data-filter="active">
+          <span>Active</span>
+          <span class="filter-counter" id="count-active">0</span>
+        </button>
+        <button class="filter-tab" data-filter="completed">
+          <span>Done</span>
+          <span class="filter-counter" id="count-completed">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Category Chips -->
+    <div class="category-chips" id="category-chips">
+      <button class="chip active" data-category="all">✨ All</button>
+      <button class="chip chip-personal" data-category="Personal">🟣 Personal</button>
+      <button class="chip chip-work" data-category="Work">🔵 Work</button>
+      <button class="chip chip-shopping" data-category="Shopping">🟠 Shopping</button>
+      <button class="chip chip-health" data-category="Health">🟢 Health</button>
+      <button class="chip chip-other" data-category="Other">⚪ Other</button>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-container">
+      <ul id="task-list" class="task-list"></ul>
+      
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon-wrapper">
+          <div class="empty-icon">✨</div>
+        </div>
+        <h3 class="empty-title">All caught up!</h3>
+        <p class="empty-subtitle">Enjoy your day or add a new task to stay organized.</p>
+      </div>
+    </div>
+
+    <!-- Footer Stats & Actions -->
+    <footer class="app-footer">
+      <span id="items-left" class="items-left">0 tasks pending</span>
+      <div class="footer-actions">
+        <button id="clear-completed" class="btn-text" title="Delete completed tasks">
+          Clear Completed
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
